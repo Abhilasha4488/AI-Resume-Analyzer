@@ -23,22 +23,6 @@ Recruiters often rely on ATS systems to filter resumes before a human reviews th
 - Dark mode interface
 - Secure login and registration flow
 
-## Demo Screenshots
-
-> Add your images in the screenshots folder and update the file names below.
-
-### Dashboard
-
-![Dashboard Screenshot](docs/screenshots/dashboard.svg)
-
-### Resume Analysis
-
-![Resume Analysis Screenshot](docs/screenshots/analysis.svg)
-
-### Admin Panel
-
-![Admin Panel Screenshot](docs/screenshots/admin.svg)
-
 ## Tech Stack
 
 - Python
