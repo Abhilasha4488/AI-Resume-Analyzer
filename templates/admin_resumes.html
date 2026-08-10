@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}
+All Resumes
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2>
+            <i class="fa-solid fa-file"></i>
+            Uploaded Resumes
+        </h2>
+
+        <a href="{{ url_for('admin_dashboard') }}"
+           class="btn btn-secondary">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back
+
+        </a>
+
+    </div>
+
+    <div class="glass-card">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover table-striped">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Resume</th>
+                        <th>ATS Score</th>
+                        <th>Resume Score</th>
+                        <th>Upload Date</th>
+                        <th>Download</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for resume in resumes %}
+
+                    <tr>
+
+                        <td>{{ resume.id }}</td>
+                        <td>{{ resume.fullname }}</td>
+                        <td>{{ resume.email }}</td>
+                        <td>{{ resume.filename }}</td>
+                        <td>{{ resume.ats_score }}%</td>
+                        <td>{{ resume.resume_score }}%</td>
+                        <td>{{ resume.upload_date }}</td>
+
+                        <td>
+
+                            <a href="{{ url_for('download_resume', filename=resume.filename) }}"
+                               class="btn btn-success btn-sm">
+
+                                <i class="fa-solid fa-download"></i>
+
+                                Download
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+
+                        <td colspan="8" class="text-center">
+
+                            No resumes uploaded yet.
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+
+{% block title %}
+Resume Analysis
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="text-center mb-4">
+        📄 AI Resume Analysis
+    </h2>
+
+    <!-- Scores -->
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <div class="glass-card mb-4">
+
+                <div class="card-body text-center">
+
+                    <h4>
+                        <i class="fa-solid fa-chart-line"></i>
+                        ATS Score
+                    </h4>
+
+                    <div class="progress mt-3" style="height:30px;">
+
+                        <div
+                            class="progress-bar bg-success progress-bar-striped progress-bar-animated"
+                            style="width:{{ ats_score }}%;">
+
+                            {{ ats_score }}%
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="glass-card mb-4">
+
+                <div class="card-body text-center">
+
+                    <h4>
+                        <i class="fa-solid fa-star"></i>
+                        Resume Score
+                    </h4>
+
+                    <div class="progress mt-3" style="height:30px;">
+
+                        <div
+                            class="progress-bar bg-info progress-bar-striped progress-bar-animated"
+                            style="width:{{ resume_score }}%;">
+
+                            {{ resume_score }}%
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+    <div class="row">
+
+        <!-- ATS History -->
+        <div class="col-md-8">
+
+            <div class="glass-card mb-4">
+
+                <div class="card-body">
+
+                    <h4>
+                        📈 ATS History
+                    </h4>
+
+                    <canvas id="lineChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Skills Pie -->
+        <div class="col-md-4">
+
+            <div class="glass-card mb-4">
+
+                <div class="card-body">
+
+                    <h4>
+                        🥧 Skills Distribution
+                    </h4>
+
+                    <canvas id="pieChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Resume Comparison -->
+    <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="glass-card mb-4">
+
+                <div class="card-body">
+
+                    <h4>
+                        📊 Resume Comparison
+                    </h4>
+
+                    <canvas id="compareChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Skills -->
+
+    <div class="glass-card mb-4">
+
+        <div class="card-body">
+
+            <h4>
+                <i class="fa-solid fa-code"></i>
+                Detected Skills
+            </h4>
+
+            {% if skills %}
+
+                {% for skill in skills %}
+
+                    <span class="badge bg-primary m-1 p-2">
+                        {{ skill }}
+                    </span>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>No skills detected.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- Missing Skills -->
+
+    <div class="glass-card mb-4">
+
+        <div class="card-body">
+
+            <h4>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Missing Skills
+            </h4>
+
+            {% for skill in missing_skills %}
+
+                <span class="badge bg-danger m-1 p-2">
+                    {{ skill }}
+                </span>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <!-- Jobs -->
+
+    <div class="glass-card mb-4">
+
+        <div class="card-body">
+
+            <h4>
+
+                <i class="fa-solid fa-briefcase"></i>
+
+                Recommended Jobs
+
+            </h4>
+
+            {% for job in jobs %}
+
+                <span class="badge bg-success m-1 p-2">
+
+                    {{ job }}
+
+                </span>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+     AI Resume Improvement Suggestions
+========================================== -->
+
+<div class="glass-card mt-4">
+
+    <h3 class="mb-4">
+
+        <i class="fa-solid fa-robot"></i>
+
+        AI Resume Improvement Suggestions
+
+    </h3>
+
+    {% if improvement_suggestions %}
+
+        {% for suggestion in improvement_suggestions %}
+
+        <div class="alert alert-info d-flex align-items-start">
+
+            <i class="fa-solid fa-lightbulb mt-1 me-2"></i>
+
+            <span>
+                {{ suggestion }}
+            </span>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="alert alert-success">
+
+            <i class="fa-solid fa-check-circle"></i>
+
+            Your resume looks good! Keep improving it with
+            job-specific keywords and measurable achievements.
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+    <!-- Resume Text -->
+
+    <div class="glass-card mb-4">
+
+        <div class="card-body">
+
+            <h4>
+
+                <i class="fa-solid fa-file-lines"></i>
+
+                Resume Text
+
+            </h4>
+
+            <pre style="white-space:pre-wrap;">{{ resume_text }}</pre>
+
+        </div>
+
+    </div>
+
+    <!-- Buttons -->
+
+    <div class="text-center mb-5">
+
+    <button onclick="history.back()"
+            class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back
+    </button>
+
+    <a href="{{ url_for('dashboard') }}"
+       class="btn btn-primary">
+        <i class="fa-solid fa-house"></i>
+        Dashboard
+    </a>
+
+        <a href="{{ url_for('download_report', resume_id=resume.id) }}"
+           class="btn btn-danger">
+
+            <i class="fa-solid fa-download"></i>
+
+            Download PDF
+
+        </a>
+
+        <a href="{{ url_for('email_report', resume_id=resume.id) }}"
+           class="btn btn-success">
+
+            <i class="fa-solid fa-envelope"></i>
+
+            Email Report
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+new Chart(document.getElementById("lineChart"),{
+
+    type:"line",
+
+    data:{
+
+        labels:{{ chart_labels|tojson }},
+
+        datasets:[{
+
+            label:"ATS Score",
+
+            data:{{ ats_history|tojson }},
+
+            borderColor:"blue",
+
+            backgroundColor:"rgba(0,123,255,.2)",
+
+            fill:true,
+
+            tension:.4
+
+        }]
+
+    },
+
+    options:{
+
+        responsive:true,
+
+        scales:{
+
+            y:{
+
+                beginAtZero:true,
+
+                max:100
+
+            }
+
+        }
+
+    }
+
+});
+
+new Chart(document.getElementById("pieChart"),{
+
+    type:"pie",
+
+    data:{
+
+        labels:{{ skills|tojson }},
+
+        datasets:[{
+
+            data:Array({{ skills|length }}).fill(1)
+
+        }]
+
+    }
+
+});
+
+new Chart(document.getElementById("compareChart"),{
+
+    type:"bar",
+
+    data:{
+
+        labels:{{ chart_labels|tojson }},
+
+        datasets:[
+
+            {
+
+                label:"ATS Score",
+
+                data:{{ ats_history|tojson }},
+
+                backgroundColor:"rgba(54,162,235,.6)"
+
+            },
+
+            {
+
+                label:"Resume Score",
+
+                data:{{ resume_history|tojson }},
+
+                backgroundColor:"rgba(255,99,132,.6)"
+
+            }
+
+        ]
+
+    },
+
+    options:{
+
+        responsive:true,
+
+        scales:{
+
+            y:{
+
+                beginAtZero:true,
+
+                max:100
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

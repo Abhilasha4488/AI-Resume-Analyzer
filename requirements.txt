@@ -1,0 +1,11 @@
+Flask
+Flask-Login
+Flask-WTF
+Flask-Bcrypt
+Flask-Mail
+email-validator
+PyMuPDF
+python-docx
+spacy
+pandas
+reportlab

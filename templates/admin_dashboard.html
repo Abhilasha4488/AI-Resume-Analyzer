@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2>
+
+            <i class="fa-solid fa-chart-line"></i>
+
+            Admin Dashboard
+
+        </h2>
+
+        <a href="{{ url_for('logout') }}"
+           class="btn btn-danger">
+
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+            Logout
+
+        </a>
+
+    </div>
+
+    <!-- Statistics Cards -->
+
+    <div class="row">
+
+        <div class="col-md-4">
+
+            <div class="glass-card text-center mb-4">
+
+                <h5>
+
+                    <i class="fa-solid fa-users"></i>
+
+                    Total Users
+
+                </h5>
+
+                <h2>{{ total_users }}</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="glass-card text-center mb-4">
+
+                <h5>
+
+                    <i class="fa-solid fa-file"></i>
+
+                    Total Resumes
+
+                </h5>
+
+                <h2>{{ total_resumes }}</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="glass-card text-center mb-4">
+
+                <h5>
+
+                    <i class="fa-solid fa-chart-line"></i>
+
+                    Average ATS
+
+                </h5>
+
+                <h2>{{ average_ats }}%</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Buttons -->
+
+    <div class="text-center mb-4">
+
+        <a href="{{ url_for('admin_users') }}"
+           class="btn btn-primary m-2">
+
+            <i class="fa-solid fa-users"></i>
+
+            View Users
+
+        </a>
+
+        <a href="{{ url_for('admin_resumes') }}"
+           class="btn btn-success m-2">
+
+            <i class="fa-solid fa-file"></i>
+
+            View Resumes
+
+        </a>
+
+        <a href="{{ url_for('ats_leaderboard') }}"
+           class="btn btn-warning m-2">
+
+            <i class="fa-solid fa-trophy"></i>
+
+            ATS Leaderboard
+
+        </a>
+
+    </div>
+
+    <!-- Overall Statistics -->
+
+    <div class="glass-card mb-5">
+
+        <h4 class="mb-3">
+
+            <i class="fa-solid fa-chart-column"></i>
+
+            Overall Statistics
+
+        </h4>
+
+        <canvas id="myChart"></canvas>
+
+    </div>
+
+    <!-- ATS Analytics -->
+
+    <div class="glass-card mb-5">
+
+        <h4 class="mb-3">
+
+            <i class="fa-solid fa-chart-line"></i>
+
+            ATS Analytics
+
+        </h4>
+
+        <canvas id="adminChart"></canvas>
+
+    </div>
+
+    <!-- Bottom Buttons -->
+
+    <div class="text-center">
+
+        <button onclick="history.back()"
+                class="btn btn-secondary me-2">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back
+
+        </button>
+
+        <a href="{{ url_for('logout') }}"
+           class="btn btn-danger">
+
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+            Logout
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+// =====================
+// Overall Statistics
+// =====================
+
+const ctx = document.getElementById("myChart");
+
+new Chart(ctx, {
+
+    type: "bar",
+
+    data: {
+
+        labels: [
+
+            "Users",
+
+            "Resumes",
+
+            "Average ATS"
+
+        ],
+
+        datasets: [{
+
+            label: "Statistics",
+
+            data: [
+
+                {{ total_users }},
+
+                {{ total_resumes }},
+
+                {{ average_ats }}
+
+            ],
+
+            backgroundColor: [
+
+                "#4e73df",
+
+                "#1cc88a",
+
+                "#f6c23e"
+
+            ],
+
+            borderWidth: 1
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true
+
+            }
+
+        }
+
+    }
+
+});
+
+
+// =====================
+// ATS Analytics
+// =====================
+
+const adminChart = document.getElementById("adminChart");
+
+new Chart(adminChart, {
+
+    type: "line",
+
+    data: {
+
+        labels: {{ chart_labels | tojson }},
+
+        datasets: [{
+
+            label: "ATS Score",
+
+            data: {{ chart_values | tojson }},
+
+            borderColor: "#36A2EB",
+
+            backgroundColor: "rgba(54,162,235,0.2)",
+
+            fill: true,
+
+            tension: 0.4
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                max: 100
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
+{% endblock %}
