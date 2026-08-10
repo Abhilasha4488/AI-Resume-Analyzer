@@ -29,15 +29,15 @@ Recruiters often rely on ATS systems to filter resumes before a human reviews th
 
 ### Dashboard
 
-![Dashboard Screenshot](docs/screenshots/dashboard.png)
+![Dashboard Screenshot](docs/screenshots/dashboard.svg)
 
 ### Resume Analysis
 
-![Resume Analysis Screenshot](docs/screenshots/analysis.png)
+![Resume Analysis Screenshot](docs/screenshots/analysis.svg)
 
 ### Admin Panel
 
-![Admin Panel Screenshot](docs/screenshots/admin.png)
+![Admin Panel Screenshot](docs/screenshots/admin.svg)
 
 ## Tech Stack
 
