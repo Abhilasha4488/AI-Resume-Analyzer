@@ -1,19 +1,43 @@
 # AI Resume Analyzer
 
-AI Resume Analyzer is a Flask-based web application that helps users upload their resumes, analyze ATS compatibility, extract key skills, receive job recommendations, and view improvement suggestions.
+A smart Flask-based application for analyzing resumes, scoring ATS compatibility, and suggesting improvements to increase the chances of landing an interview.
 
-## Features
+## Project Description for Portfolio
 
-- User registration and login
-- Resume upload support for PDF and DOCX files
+Built an AI-powered resume evaluation platform that helps users upload their resumes, detect missing skills, benchmark ATS performance, and receive actionable recommendations for improving job-readiness. The project combines resume parsing, scoring logic, data storage, and a polished dashboard to create a practical career-tech application with real-world usefulness.
+
+## Why This Project Matters
+
+Recruiters often rely on ATS systems to filter resumes before a human reviews them. This project addresses that gap by helping candidates understand how well their resume matches job expectations and what they need to improve.
+
+## Key Features
+
+- Resume upload for PDF and DOCX files
 - ATS score analysis
-- Skill extraction and matching
+- Skill extraction from uploaded resumes
 - Job recommendations based on detected skills
-- Improvement suggestions for resume optimization
-- Admin dashboard for user and resume management
-- Downloadable PDF report
-- Email report functionality
-- Dark mode UI
+- Resume improvement suggestions
+- Admin dashboard for monitoring users and resumes
+- Report download in PDF format
+- Email report delivery support
+- Dark mode interface
+- Secure login and registration flow
+
+## Demo Screenshots
+
+> Add your images in the screenshots folder and update the file names below.
+
+### Dashboard
+
+![Dashboard Screenshot](docs/screenshots/dashboard.png)
+
+### Resume Analysis
+
+![Resume Analysis Screenshot](docs/screenshots/analysis.png)
+
+### Admin Panel
+
+![Admin Panel Screenshot](docs/screenshots/admin.png)
 
 ## Tech Stack
 
@@ -21,7 +45,8 @@ AI Resume Analyzer is a Flask-based web application that helps users upload thei
 - Flask
 - SQLite
 - ReportLab
-- PyMuPDF / python-docx
+- PyMuPDF
+- python-docx
 - HTML, CSS, JavaScript
 
 ## Project Structure
@@ -32,9 +57,13 @@ AI-Resume-Analyzer/
 ├── config.py
 ├── check_db.py
 ├── requirements.txt
+├── README.md
 ├── resume_analyzer.db
 ├── database/
 │   └── init_db.py
+├── docs/
+│   └── screenshots/
+│       └── README.md
 ├── static/
 │   ├── css/
 │   ├── images/
@@ -83,13 +112,13 @@ cd AI-Resume-Analyzer
 python -m venv venv
 ```
 
-On Windows:
+Windows:
 
 ```bash
 venv\Scripts\activate
 ```
 
-On macOS/Linux:
+macOS/Linux:
 
 ```bash
 source venv/bin/activate
@@ -107,32 +136,32 @@ pip install -r requirements.txt
 python database/init_db.py
 ```
 
-5. Run the application
+5. Start the app
 
 ```bash
 python app.py
 ```
 
-Then open:
+Open the app in your browser at:
 
 ```text
 http://127.0.0.1:5000
 ```
 
-## Default Admin Login
+## Default Admin Credentials
 
 - Username: `admin`
 - Password: `admin123`
 
 ## Notes
 
-- The project uses SQLite for local storage.
-- Email sending is configured through Flask-Mail and Gmail SMTP.
-- For production use, store secret keys and mail credentials in environment variables.
+- SQLite is used for local data storage.
+- Email functionality is configured with Flask-Mail and Gmail SMTP.
+- For production deployment, you should move sensitive values like secret keys and email credentials to environment variables.
 
 ## License
 
-This project is for educational and personal use.
+This project is intended for educational and portfolio use.
 
 ## Author
 
