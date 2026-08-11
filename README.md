@@ -129,7 +129,7 @@ python app.py
 Open the app in your browser at:
 
 ```text
-http://127.0.0.1:5000
+http://192.168.0.200:5000
 ```
 
 ## Default Admin Credentials
