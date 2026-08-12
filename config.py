@@ -68,7 +68,7 @@ UPLOAD_FOLDER = env_str(
 
 SECRET_KEY = env_str(
     "SECRET_KEY",
-    "resume_analyzer_secret_key"
+    "876c9b2ee3d9a9c41e3aa0dd3ebd3485e0245e207e4fda9157332fad57c2c2d8"
 )
 
 

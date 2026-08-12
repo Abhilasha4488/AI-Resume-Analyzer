@@ -763,15 +763,26 @@ def email_report(resume_id):
         f"Resume_Report_{resume_id}.pdf"
     )
 
+    # Generate report if it doesn't exist
     if not os.path.exists(pdf_path):
         return redirect(
             url_for("download_report", resume_id=resume_id)
         )
 
+    # Check email configuration
+    sender = app.config.get("MAIL_DEFAULT_SENDER")
+
+    if not sender:
+        flash(
+            "Email service is not configured. Please configure MAIL_USERNAME and MAIL_DEFAULT_SENDER.",
+            "danger"
+        )
+        return redirect(url_for("analysis", resume_id=resume_id))
+
     msg = Message(
-    "Your AI Resume Analysis Report",
-    sender=config.MAIL_DEFAULT_SENDER,
-    recipients=[user["email"]]
+        subject="Your Resume Analysis Report",
+        sender=sender,
+        recipients=[user["email"]]
     )
 
     msg.body = (
@@ -792,7 +803,9 @@ def email_report(resume_id):
 
     flash("Email sent successfully!", "success")
 
-    return redirect(url_for("analysis", resume_id=resume_id))
+    return redirect(
+        url_for("analysis", resume_id=resume_id)
+    )
 # =========================
 # Logout
 # =========================
