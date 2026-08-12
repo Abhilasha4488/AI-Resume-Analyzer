@@ -769,8 +769,9 @@ def email_report(resume_id):
         )
 
     msg = Message(
-        "Your AI Resume Analysis Report",
-        recipients=[user["email"]]
+    "Your AI Resume Analysis Report",
+    sender=config.MAIL_DEFAULT_SENDER,
+    recipients=[user["email"]]
     )
 
     msg.body = (
@@ -928,5 +929,4 @@ def logout():
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    
+    app.run(debug=True, host="0.0.0.0")
