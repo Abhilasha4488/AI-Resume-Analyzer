@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -68,7 +71,7 @@ UPLOAD_FOLDER = env_str(
 
 SECRET_KEY = env_str(
     "SECRET_KEY",
-    "876c9b2ee3d9a9c41e3aa0dd3ebd3485e0245e207e4fda9157332fad57c2c2d8"
+    ""
 )
 
 
@@ -88,12 +91,12 @@ ALLOWED_EXTENSIONS = {
 
 ADMIN_USERNAME = env_str(
     "ADMIN_USERNAME",
-    "admin"
+    ""
 )
 
 ADMIN_PASSWORD = env_str(
     "ADMIN_PASSWORD",
-    "admin123"
+    ""
 )
 
 
@@ -130,4 +133,3 @@ MAIL_DEFAULT_SENDER = env_str(
     "MAIL_DEFAULT_SENDER",
     MAIL_USERNAME
 )
-

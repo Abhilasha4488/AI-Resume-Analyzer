@@ -748,64 +748,191 @@ def email_report(resume_id):
     ).fetchone()
 
     resume = conn.execute(
-        "SELECT * FROM resumes WHERE id=? AND user_id=?",
+        """
+        SELECT * FROM resumes
+        WHERE id=? AND user_id=?
+        """,
         (resume_id, session["user_id"])
     ).fetchone()
 
     conn.close()
 
+    if user is None:
+        flash("User not found.", "danger")
+        return redirect(url_for("dashboard"))
+
     if resume is None:
         flash("Resume not found.", "danger")
         return redirect(url_for("dashboard"))
+
+    # =========================
+    # Check Email Configuration
+    # =========================
+
+    if not config.MAIL_USERNAME or not config.MAIL_PASSWORD:
+        flash(
+            "Email service is not configured. Please configure MAIL_USERNAME and MAIL_PASSWORD.",
+            "danger"
+        )
+        return redirect(url_for("analysis", resume_id=resume_id))
+
+    # =========================
+    # Resume File
+    # =========================
+
+    filepath = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        resume["filename"]
+    )
+
+    if not os.path.exists(filepath):
+        flash("Resume file not found.", "danger")
+        return redirect(url_for("dashboard"))
+
+    # =========================
+    # Generate PDF Report
+    # =========================
+
+    text = extract_resume_text(filepath)
+
+    skills = extract_skills(text)
+
+    ats_score, missing_skills = calculate_ats_score(text)
+
+    resume_score = min(len(skills) * 10, 100)
+
+    jobs = recommend_jobs(skills)
 
     pdf_path = os.path.join(
         app.config["UPLOAD_FOLDER"],
         f"Resume_Report_{resume_id}.pdf"
     )
 
-    # Generate report if it doesn't exist
-    if not os.path.exists(pdf_path):
-        return redirect(
-            url_for("download_report", resume_id=resume_id)
-        )
+    styles = getSampleStyleSheet()
 
-    # Check email configuration
-    sender = app.config.get("MAIL_DEFAULT_SENDER")
+    doc = SimpleDocTemplate(pdf_path)
 
-    if not sender:
-        flash(
-            "Email service is not configured. Please configure MAIL_USERNAME and MAIL_DEFAULT_SENDER.",
-            "danger"
+    story = []
+
+    story.append(
+        Paragraph(
+            "<b>AI Resume Analyzer Report</b>",
+            styles["Title"]
         )
-        return redirect(url_for("analysis", resume_id=resume_id))
+    )
+
+    story.append(
+        Paragraph(
+            f"Candidate: {user['fullname']}",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"Email: {user['email']}",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"ATS Score: {ats_score}%",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"Resume Score: {resume_score}%",
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            "Skills: " + ", ".join(skills),
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            "Recommended Jobs: " + ", ".join(jobs),
+            styles["BodyText"]
+        )
+    )
+
+    story.append(
+        Paragraph(
+            "Missing Skills: " + ", ".join(missing_skills),
+            styles["BodyText"]
+        )
+    )
+
+    doc.build(story)
+
+    # =========================
+    # Create Email
+    # =========================
 
     msg = Message(
-        subject="Your Resume Analysis Report",
-        sender=sender,
+        subject="Your AI Resume Analysis Report",
+        sender=config.MAIL_DEFAULT_SENDER,
         recipients=[user["email"]]
     )
 
     msg.body = (
         f"Hello {user['fullname']},\n\n"
-        "Please find your Resume Analysis Report attached.\n\n"
+        "Your AI Resume Analysis Report is ready.\n\n"
+        f"ATS Score: {ats_score}%\n"
+        f"Resume Score: {resume_score}%\n\n"
+        "Please find the complete PDF report attached to this email.\n\n"
         "Regards,\n"
         "AI Resume Analyzer"
     )
 
+    # =========================
+    # Attach PDF
+    # =========================
+
     with open(pdf_path, "rb") as f:
+
         msg.attach(
             f"Resume_Report_{resume_id}.pdf",
             "application/pdf",
             f.read()
         )
 
-    mail.send(msg)
+    # =========================
+    # Send Email
+    # =========================
 
-    flash("Email sent successfully!", "success")
+    try:
+
+        mail.send(msg)
+
+        flash(
+            f"Report sent successfully to {user['email']}!",
+            "success"
+        )
+
+    except Exception as e:
+
+        print("EMAIL ERROR:", e)
+
+        flash(
+            "Unable to send email. Please check your email configuration.",
+            "danger"
+        )
 
     return redirect(
-        url_for("analysis", resume_id=resume_id)
+        url_for(
+            "analysis",
+            resume_id=resume_id
+        )
     )
+    
 # =========================
 # Logout
 # =========================
