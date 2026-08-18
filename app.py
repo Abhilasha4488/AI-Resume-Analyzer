@@ -38,6 +38,7 @@ app.config["MAIL_USE_TLS"] = config.MAIL_USE_TLS
 app.config["MAIL_USERNAME"] = config.MAIL_USERNAME
 app.config["MAIL_PASSWORD"] = config.MAIL_PASSWORD
 app.config["MAIL_DEFAULT_SENDER"] = config.MAIL_DEFAULT_SENDER
+app.config["MAIL_TIMEOUT"] = config.MAIL_TIMEOUT
 
 mail = Mail(app)
 
@@ -904,13 +905,15 @@ def email_report(resume_id):
             f.read()
         )
 
-    # =========================
+        # =========================
     # Send Email
     # =========================
 
     try:
 
         mail.send(msg)
+
+        print("EMAIL SENT SUCCESSFULLY")
 
         flash(
             f"Report sent successfully to {user['email']}!",
@@ -919,7 +922,7 @@ def email_report(resume_id):
 
     except Exception as e:
 
-        print("EMAIL ERROR:", e)
+        print("EMAIL ERROR:", repr(e))
 
         flash(
             "Unable to send email. Please check your email configuration.",
@@ -932,6 +935,7 @@ def email_report(resume_id):
             resume_id=resume_id
         )
     )
+    
     
 # =========================
 # Logout

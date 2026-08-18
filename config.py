@@ -133,3 +133,8 @@ MAIL_DEFAULT_SENDER = env_str(
     "MAIL_DEFAULT_SENDER",
     MAIL_USERNAME
 )
+
+MAIL_TIMEOUT = env_int(
+    "MAIL_TIMEOUT",
+    30
+)
