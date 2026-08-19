@@ -71,7 +71,7 @@ UPLOAD_FOLDER = env_str(
 
 SECRET_KEY = env_str(
     "SECRET_KEY",
-    ""
+    "change-this-secret-key"
 )
 
 
@@ -136,5 +136,5 @@ MAIL_DEFAULT_SENDER = env_str(
 
 MAIL_TIMEOUT = env_int(
     "MAIL_TIMEOUT",
-    30
+    10
 )

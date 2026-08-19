@@ -15,6 +15,7 @@ from werkzeug.utils import secure_filename
 
 import sqlite3
 import os
+import resend
 import config
 
 from utils.parser import extract_resume_text
@@ -767,15 +768,22 @@ def email_report(resume_id):
         return redirect(url_for("dashboard"))
 
     # =========================
-    # Check Email Configuration
+    # Check Resend Configuration
     # =========================
 
-    if not config.MAIL_USERNAME or not config.MAIL_PASSWORD:
+    resend_api_key = os.getenv("RESEND_API_KEY")
+
+    if not resend_api_key:
         flash(
-            "Email service is not configured. Please configure MAIL_USERNAME and MAIL_PASSWORD.",
+            "Email service is not configured. Please configure RESEND_API_KEY.",
             "danger"
         )
-        return redirect(url_for("analysis", resume_id=resume_id))
+        return redirect(
+            url_for(
+                "analysis",
+                resume_id=resume_id
+            )
+        )
 
     # =========================
     # Resume File
@@ -787,133 +795,186 @@ def email_report(resume_id):
     )
 
     if not os.path.exists(filepath):
-        flash("Resume file not found.", "danger")
-        return redirect(url_for("dashboard"))
+        flash(
+            "Resume file not found.",
+            "danger"
+        )
+        return redirect(
+            url_for("dashboard")
+        )
 
     # =========================
-    # Generate PDF Report
-    # =========================
-
-    text = extract_resume_text(filepath)
-
-    skills = extract_skills(text)
-
-    ats_score, missing_skills = calculate_ats_score(text)
-
-    resume_score = min(len(skills) * 10, 100)
-
-    jobs = recommend_jobs(skills)
-
-    pdf_path = os.path.join(
-        app.config["UPLOAD_FOLDER"],
-        f"Resume_Report_{resume_id}.pdf"
-    )
-
-    styles = getSampleStyleSheet()
-
-    doc = SimpleDocTemplate(pdf_path)
-
-    story = []
-
-    story.append(
-        Paragraph(
-            "<b>AI Resume Analyzer Report</b>",
-            styles["Title"]
-        )
-    )
-
-    story.append(
-        Paragraph(
-            f"Candidate: {user['fullname']}",
-            styles["BodyText"]
-        )
-    )
-
-    story.append(
-        Paragraph(
-            f"Email: {user['email']}",
-            styles["BodyText"]
-        )
-    )
-
-    story.append(
-        Paragraph(
-            f"ATS Score: {ats_score}%",
-            styles["BodyText"]
-        )
-    )
-
-    story.append(
-        Paragraph(
-            f"Resume Score: {resume_score}%",
-            styles["BodyText"]
-        )
-    )
-
-    story.append(
-        Paragraph(
-            "Skills: " + ", ".join(skills),
-            styles["BodyText"]
-        )
-    )
-
-    story.append(
-        Paragraph(
-            "Recommended Jobs: " + ", ".join(jobs),
-            styles["BodyText"]
-        )
-    )
-
-    story.append(
-        Paragraph(
-            "Missing Skills: " + ", ".join(missing_skills),
-            styles["BodyText"]
-        )
-    )
-
-    doc.build(story)
-
-    # =========================
-    # Create Email
-    # =========================
-
-    msg = Message(
-        subject="Your AI Resume Analysis Report",
-        sender=config.MAIL_DEFAULT_SENDER,
-        recipients=[user["email"]]
-    )
-
-    msg.body = (
-        f"Hello {user['fullname']},\n\n"
-        "Your AI Resume Analysis Report is ready.\n\n"
-        f"ATS Score: {ats_score}%\n"
-        f"Resume Score: {resume_score}%\n\n"
-        "Please find the complete PDF report attached to this email.\n\n"
-        "Regards,\n"
-        "AI Resume Analyzer"
-    )
-
-    # =========================
-    # Attach PDF
-    # =========================
-
-    with open(pdf_path, "rb") as f:
-
-        msg.attach(
-            f"Resume_Report_{resume_id}.pdf",
-            "application/pdf",
-            f.read()
-        )
-
-        # =========================
-    # Send Email
+    # Generate Report Data
     # =========================
 
     try:
 
-        mail.send(msg)
+        text = extract_resume_text(filepath)
 
-        print("EMAIL SENT SUCCESSFULLY")
+        skills = extract_skills(text)
+
+        ats_score, missing_skills = calculate_ats_score(text)
+
+        resume_score = min(
+            len(skills) * 10,
+            100
+        )
+
+        jobs = recommend_jobs(skills)
+
+        # =========================
+        # Generate PDF
+        # =========================
+
+        pdf_path = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            f"Resume_Report_{resume_id}.pdf"
+        )
+
+        styles = getSampleStyleSheet()
+
+        doc = SimpleDocTemplate(
+            pdf_path
+        )
+
+        story = []
+
+        story.append(
+            Paragraph(
+                "<b>AI Resume Analyzer Report</b>",
+                styles["Title"]
+            )
+        )
+
+        story.append(
+            Paragraph(
+                f"Candidate: {user['fullname']}",
+                styles["BodyText"]
+            )
+        )
+
+        story.append(
+            Paragraph(
+                f"Email: {user['email']}",
+                styles["BodyText"]
+            )
+        )
+
+        story.append(
+            Paragraph(
+                f"ATS Score: {ats_score}%",
+                styles["BodyText"]
+            )
+        )
+
+        story.append(
+            Paragraph(
+                f"Resume Score: {resume_score}%",
+                styles["BodyText"]
+            )
+        )
+
+        story.append(
+            Paragraph(
+                "Skills: " + ", ".join(skills),
+                styles["BodyText"]
+            )
+        )
+
+        story.append(
+            Paragraph(
+                "Recommended Jobs: " + ", ".join(jobs),
+                styles["BodyText"]
+            )
+        )
+
+        story.append(
+            Paragraph(
+                "Missing Skills: " + ", ".join(missing_skills),
+                styles["BodyText"]
+            )
+        )
+
+        doc.build(story)
+
+        # =========================
+        # Read PDF
+        # =========================
+
+        with open(pdf_path, "rb") as f:
+            pdf_data = f.read()
+
+        # =========================
+        # Configure Resend
+        # =========================
+
+        resend.api_key = resend_api_key
+
+        # =========================
+        # Send Email
+        # =========================
+
+        params = {
+            "from": "AI Resume Analyzer <onboarding@resend.dev>",
+            "to": [user["email"]],
+            "subject": "Your AI Resume Analysis Report",
+
+            "html": f"""
+            <html>
+                <body>
+
+                    <h2>AI Resume Analyzer</h2>
+
+                    <p>
+                        Hello {user['fullname']},
+                    </p>
+
+                    <p>
+                        Your AI Resume Analysis Report is ready.
+                    </p>
+
+                    <h3>Resume Results</h3>
+
+                    <p>
+                        <strong>ATS Score:</strong>
+                        {ats_score}%
+                    </p>
+
+                    <p>
+                        <strong>Resume Score:</strong>
+                        {resume_score}%
+                    </p>
+
+                    <p>
+                        Please find your complete PDF
+                        resume analysis report attached.
+                    </p>
+
+                    <br>
+
+                    <p>
+                        Regards,<br>
+                        <strong>AI Resume Analyzer</strong>
+                    </p>
+
+                </body>
+            </html>
+            """,
+
+            "attachments": [
+                {
+                    "filename": f"Resume_Report_{resume_id}.pdf",
+                    "content": pdf_data
+                }
+            ]
+        }
+
+        response = resend.Emails.send(params)
+
+        print(
+            "RESEND EMAIL RESPONSE:",
+            response
+        )
 
         flash(
             f"Report sent successfully to {user['email']}!",
@@ -922,10 +983,13 @@ def email_report(resume_id):
 
     except Exception as e:
 
-        print("EMAIL ERROR:", repr(e))
+        print(
+            "RESEND EMAIL ERROR:",
+            repr(e)
+        )
 
         flash(
-            "Unable to send email. Please check your email configuration.",
+            f"Unable to send email: {str(e)}",
             "danger"
         )
 
@@ -935,7 +999,6 @@ def email_report(resume_id):
             resume_id=resume_id
         )
     )
-    
     
 # =========================
 # Logout
