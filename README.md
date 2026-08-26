@@ -19,7 +19,6 @@ Recruiters often rely on ATS systems to filter resumes before a human reviews th
 - Resume improvement suggestions
 - Admin dashboard for monitoring users and resumes
 - Report download in PDF format
-- Email report delivery support
 - Dark mode interface
 - Secure login and registration flow
 
@@ -139,8 +138,7 @@ http://192.168.0.200:5000
 ## Notes
 
 - SQLite is used for local data storage.
-- Email functionality is configured with Flask-Mail and Gmail SMTP.
-- For production deployment, you should move sensitive values like secret keys and email credentials to environment variables.
+- For production deployment, you should move sensitive values like secret keys to environment variables.
 
 ## License
 
