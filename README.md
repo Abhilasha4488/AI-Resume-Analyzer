@@ -80,6 +80,10 @@ AI-Resume-Analyzer/
 │   └── recommender.py
 └── README.md
 ```
+## 🚀 Live Demo
+
+**Deployed Application:**  
+https://ai-resume-analyzer-1-shub.onrender.com
 
 ## Setup Instructions
 
