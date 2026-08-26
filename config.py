@@ -134,7 +134,3 @@ MAIL_DEFAULT_SENDER = env_str(
     MAIL_USERNAME
 )
 
-MAIL_TIMEOUT = env_int(
-    "MAIL_TIMEOUT",
-    10
-)
